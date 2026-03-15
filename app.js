@@ -45,9 +45,15 @@ function normalizeTeamName(name) {
 }
 
 const ROUND_DATES = {
-  1: '14/03/2026',
-  2: 'TBD', 3: 'TBD', 4: 'TBD', 5: 'TBD',
-  6: 'TBD', 7: 'TBD', 8: 'TBD', 9: 'TBD', 10: 'TBD',
+  1: '14/03/2026', 2: '25/04/2026', 3: '16/05/2026', 4: '13/06/2026',
+  5: '11/07/2026', 6: '29/08/2026', 7: '19/09/2026', 8: '10/10/2026',
+  9: '21/11/2026', 10: '30/01/2027',
+};
+
+const ROUND_COURSES = {
+  1: 'North', 2: 'North', 3: 'South', 4: 'East',
+  5: 'East', 6: 'South', 7: 'South', 8: 'East',
+  9: 'East', 10: 'North',
 };
 
 let playersData = [];
@@ -346,6 +352,7 @@ function sheetRowToTeam(row) {
 async function loadData() {
   // Always start with fallback so something renders immediately
   useFallbackData();
+  renderScheduleBar();
   renderScoreboard();
   renderAttendance();
   renderTeams();
@@ -489,6 +496,57 @@ function calcBest5(rounds) {
   if (scores.length === 0) return 0;
   scores.sort((a, b) => b - a);
   return scores.slice(0, 5).reduce((sum, s) => sum + s, 0);
+}
+
+function renderScheduleBar() {
+  const bar = document.getElementById('schedule-bar');
+  if (!bar) return;
+
+  const courseColors = { 'North': '#4A90D9', 'South': '#D4A843', 'East': '#E06060' };
+
+  // Determine which round is "next" (first round whose date is today or in the future)
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  let nextRound = null;
+  for (let i = 1; i <= 10; i++) {
+    const parts = ROUND_DATES[i].split('/');
+    if (parts.length === 3) {
+      const d = new Date(parts[2], parts[1] - 1, parts[0]);
+      if (d >= today) { nextRound = i; break; }
+    }
+  }
+
+  bar.innerHTML = Array.from({ length: 10 }, (_, i) => {
+    const r = i + 1;
+    const date = ROUND_DATES[r] || 'TBD';
+    const course = ROUND_COURSES[r] || '';
+    const color = courseColors[course] || '#888';
+    const isNext = r === nextRound;
+    const isPast = !isNext && (() => {
+      const parts = date.split('/');
+      if (parts.length === 3) {
+        const d = new Date(parts[2], parts[1] - 1, parts[0]);
+        return d < today;
+      }
+      return false;
+    })();
+    const cls = isNext ? 'schedule-chip schedule-chip--next' : (isPast ? 'schedule-chip schedule-chip--past' : 'schedule-chip');
+    return `<div class="${cls}">
+      <div class="schedule-chip-round">R${r}</div>
+      <div class="schedule-chip-date">${date}</div>
+      <div class="schedule-chip-course" style="color:${color}">${course} Course</div>
+    </div>`;
+  }).join('');
+
+  // Auto-scroll to the next upcoming round
+  if (nextRound) {
+    const chip = bar.children[nextRound - 1];
+    if (chip) {
+      setTimeout(() => {
+        chip.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' });
+      }, 300);
+    }
+  }
 }
 
 function renderScoreboard() {
