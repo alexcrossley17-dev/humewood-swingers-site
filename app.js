@@ -62,7 +62,15 @@ let prizesData = [];
 
 // ============ AUTH ============
 function checkAuth() {
-  return _authed;
+  if (_authed) return true;
+  // Check localStorage for remembered session
+  try {
+    if (localStorage.getItem('hs_remember') === PASSWORD) {
+      _authed = true;
+      return true;
+    }
+  } catch (e) {}
+  return false;
 }
 
 function initGate() {
@@ -70,6 +78,7 @@ function initGate() {
   const input = document.getElementById('gate-password');
   const btn = document.getElementById('gate-submit');
   const error = document.getElementById('gate-error');
+  const remember = document.getElementById('gate-remember');
 
   if (checkAuth()) {
     gate.style.display = 'none';
@@ -81,6 +90,12 @@ function initGate() {
     const val = input.value.trim().toLowerCase();
     if (val === PASSWORD) {
       _authed = true;
+      // Save to localStorage if remember me is checked
+      try {
+        if (remember && remember.checked) {
+          localStorage.setItem('hs_remember', PASSWORD);
+        }
+      } catch (e) {}
       gate.classList.add('gate-exit');
       setTimeout(() => {
         gate.style.display = 'none';

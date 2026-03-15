@@ -223,6 +223,29 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 4px 16px rgba(212, 168, 67, 0.3);
 }
 
+.gate-remember {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: var(--space-3);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: rgba(255,255,255,0.5);
+}
+
+.gate-remember input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--gold);
+  cursor: pointer;
+}
+
+.gate-remember span {
+  user-select: none;
+}
+
 .gate-error {
   color: #ff6b6b;
   font-size: var(--text-sm);
