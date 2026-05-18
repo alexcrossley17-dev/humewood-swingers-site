@@ -535,12 +535,10 @@ h1, h2, h3, h4, h5, h6 {
   width: 180px;
   height: 180px;
   border-radius: var(--radius-full);
-  object-fit: contain;
+  object-fit: cover;
   margin: 0 auto var(--space-6);
   border: 3px solid var(--gold);
   box-shadow: 0 0 60px rgba(212, 168, 67, 0.15);
-  background: var(--white);
-  padding: 4px;
 }
 
 .hero-title {
